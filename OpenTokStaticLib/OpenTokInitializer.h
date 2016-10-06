@@ -17,8 +17,6 @@
 
 -(void)intializeWithURL:(NSString *)urlString withRequest:(NSDictionary *)request withCompletionHandler:(void(^)(NSError *error))CompletionHandler;
 
-//-(void)createSessionWithName:(NSString *)name withCode:(NSString *)code forURL:(NSString *)URL withCompletion:(void(^)(NSDictionary *response, NSError *error))CompletionHandler;
-
 @end
 
 
