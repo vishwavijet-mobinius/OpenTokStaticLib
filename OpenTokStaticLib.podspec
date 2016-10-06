@@ -5,11 +5,10 @@ Pod::Spec.new do |s|
   s.author       = { 
 			'vishwavijet-mobinius' => 'vishwavijet.nb@mobinius.com' 
 		}
-  s.source       = ''
-  s.homepage     = 'https://github.com/OpenTokStaticLib'
+  s.source       = { :git => 'https://github.com/vishwavijet-mobinius/OpenTokStaticLib.git', :tag => s.version.to_s}
+  s.homepage     = 'https://github.com/vishwavijet-mobinius/OpenTokStaticLib'
   s.license      = 'MIT'
   s.platform     = :ios, '9.0'
-  s.source_files = 'OpenTokStaticLib/*.{h,m}'
   s.framework    = 'SystemConfiguration'
   s.requires_arc = true
   s.dependency 'OpenTok'
