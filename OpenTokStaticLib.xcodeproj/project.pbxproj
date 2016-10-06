@@ -8,8 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		70CFE7866718244FA2295A6A /* Pods_OpenTokStaticLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B562D4F395B9CD3E1C17A7F /* Pods_OpenTokStaticLib.framework */; };
-		7EA0D5D81D9E8C1800DDAFE1 /* OpenTokStaticLib.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7EA0D5D71D9E8C1800DDAFE1 /* OpenTokStaticLib.h */; };
-		7EA0D5E21D9E921400DDAFE1 /* OpenTokInitializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EA0D5E11D9E921400DDAFE1 /* OpenTokInitializer.m */; };
+		7E2B1FF11DA6903900E01D88 /* OpenTokInitializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E2B1FEF1DA6903900E01D88 /* OpenTokInitializer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -19,7 +18,6 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				7EA0D5D81D9E8C1800DDAFE1 /* OpenTokStaticLib.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -28,10 +26,10 @@
 /* Begin PBXFileReference section */
 		1B562D4F395B9CD3E1C17A7F /* Pods_OpenTokStaticLib.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OpenTokStaticLib.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4865AD63AD3EE7D41F1A7198 /* Pods-OpenTokStaticLib.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenTokStaticLib.release.xcconfig"; path = "Pods/Target Support Files/Pods-OpenTokStaticLib/Pods-OpenTokStaticLib.release.xcconfig"; sourceTree = "<group>"; };
+		7E2B1FEE1DA6903900E01D88 /* OpenTokInitializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenTokInitializer.h; sourceTree = "<group>"; };
+		7E2B1FEF1DA6903900E01D88 /* OpenTokInitializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpenTokInitializer.m; sourceTree = "<group>"; };
+		7E2B1FF01DA6903900E01D88 /* OpenTokStaticLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenTokStaticLib.h; sourceTree = "<group>"; };
 		7EA0D5D41D9E8C1800DDAFE1 /* libOpenTokStaticLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libOpenTokStaticLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		7EA0D5D71D9E8C1800DDAFE1 /* OpenTokStaticLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenTokStaticLib.h; sourceTree = "<group>"; };
-		7EA0D5E01D9E921400DDAFE1 /* OpenTokInitializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenTokInitializer.h; sourceTree = "<group>"; };
-		7EA0D5E11D9E921400DDAFE1 /* OpenTokInitializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpenTokInitializer.m; sourceTree = "<group>"; };
 		EA19C0C0B5BC55DA866AD617 /* Pods-OpenTokStaticLib.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpenTokStaticLib.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OpenTokStaticLib/Pods-OpenTokStaticLib.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -55,9 +53,20 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		7E2B1FED1DA68FF400E01D88 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				7E2B1FEE1DA6903900E01D88 /* OpenTokInitializer.h */,
+				7E2B1FEF1DA6903900E01D88 /* OpenTokInitializer.m */,
+				7E2B1FF01DA6903900E01D88 /* OpenTokStaticLib.h */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
 		7EA0D5CB1D9E8C1800DDAFE1 = {
 			isa = PBXGroup;
 			children = (
+				7E2B1FED1DA68FF400E01D88 /* Library */,
 				7EA0D5D61D9E8C1800DDAFE1 /* OpenTokStaticLib */,
 				7EA0D5D51D9E8C1800DDAFE1 /* Products */,
 				BAF8BDDEEE725BB19887FC1D /* Pods */,
@@ -76,9 +85,6 @@
 		7EA0D5D61D9E8C1800DDAFE1 /* OpenTokStaticLib */ = {
 			isa = PBXGroup;
 			children = (
-				7EA0D5D71D9E8C1800DDAFE1 /* OpenTokStaticLib.h */,
-				7EA0D5E01D9E921400DDAFE1 /* OpenTokInitializer.h */,
-				7EA0D5E11D9E921400DDAFE1 /* OpenTokInitializer.m */,
 			);
 			path = OpenTokStaticLib;
 			sourceTree = "<group>";
@@ -183,7 +189,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7EA0D5E21D9E921400DDAFE1 /* OpenTokInitializer.m in Sources */,
+				7E2B1FF11DA6903900E01D88 /* OpenTokInitializer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
