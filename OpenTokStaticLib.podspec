@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => 'https://github.com/vishwavijet-mobinius/OpenTokStaticLib.git', :tag => s.version.to_s}
   s.homepage     = 'https://github.com/vishwavijet-mobinius/OpenTokStaticLib'
   s.license      = 'MIT'
-  s.source_files = 'OpenTokStaticLib/*.{h,m}'
+  s.source_files = 'Library/*.{h,m}'
   s.platform     = :ios, '9.0'
   s.framework    = 'SystemConfiguration'
   s.requires_arc = true
