@@ -9,19 +9,22 @@
 #import <Foundation/Foundation.h>
 #import <OpenTok/OpenTok.h>
 
+@protocol OpenTokInitializerDelegate <NSObject>
+
+-(void)openTokSesionConnectedWithSession:(OTSession *)session;
+
+@end
+
+
 @interface OpenTokInitializer : NSObject <OTSessionDelegate>
 
 +(OpenTokInitializer *)sharedInstance;
 
-@property(nonatomic, assign) id<OTSessionDelegate> openTokDelegate;
+@property(nonatomic, assign) id<OpenTokInitializerDelegate> openTokDelegate;
 
 -(void)intializeWithURL:(NSString *)urlString withRequest:(NSDictionary *)request withCompletionHandler:(void(^)(NSError *error))CompletionHandler;
 
 @end
 
 
-@protocol OpenTokInitializerDelegate <NSObject>
 
--(void)openTokSesionConnectedWithSession:(OTSession *)session;
-
-@end
