@@ -12,7 +12,7 @@ static OpenTokInitializer *sharedInstance = nil;
 @implementation OpenTokInitializer
 
 +(void)initialize{
-    static dispatch_once_t globalInstance = nil;
+    static dispatch_once_t globalInstance;
     dispatch_once(&globalInstance, ^{
         sharedInstance = [[OpenTokInitializer alloc] init];
     });
@@ -23,7 +23,7 @@ static OpenTokInitializer *sharedInstance = nil;
 }
 
 
--(void)intializeWithURL:(NSString *)urlString withRequest:(NSDictionary *)request withCompletionHandler:(void(^)(NSError *error))CompletionHandler
+-(void)intializeWithURL:(NSString *)urlString withRequest:(NSDictionary *)request withCompletionHandler:(void(^)(NSDictionary *response, NSError *error))CompletionHandler
 {
     NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:urlString] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:300];
     urlRequest.HTTPMethod = @"POST";
@@ -34,7 +34,6 @@ static OpenTokInitializer *sharedInstance = nil;
         return;
     }
     urlRequest.HTTPBody = data;
-    
     [urlRequest setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     
     NSURLSessionDataTask *session = [[NSURLSession sharedSession] dataTaskWithRequest:urlRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
@@ -42,30 +41,12 @@ static OpenTokInitializer *sharedInstance = nil;
         if (error == nil) {
             NSError *jsonError = nil;
             NSDictionary *responseDict =[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&jsonError];
-            NSDictionary *credentials = [responseDict valueForKey:@"data"];
-            
-            OTSession *session = [[OTSession alloc] initWithApiKey:credentials[@"apiKey"] sessionId:credentials[@"sessionId"] delegate:_openTokDelegate];
-            OTError *connectError;
-            [session connectWithToken:credentials[@"token"] error:&connectError];
-            
-            //CompletionHandler(session,nil);
+            CompletionHandler(responseDict,nil);
         }
         else{
-            CompletionHandler(error);
+            CompletionHandler(nil,error);
         }
     }];
     [session resume];
-}
-
-
--(void)sessionDidConnect:(OTSession *)session{
-    if ([self.openTokDelegate respondsToSelector:@selector(openTokSesionConnectedWithSession:)]){
-        [self.openTokDelegate performSelector:@selector(openTokSesionConnectedWithSession:) withObject:session];
-    }
-}
-
-
--(void)sessionDidDisconnect:(OTSession *)session{
-    
 }
 @end

@@ -7,22 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <OpenTok/OpenTok.h>
 
-@protocol OpenTokInitializerDelegate <NSObject>
-
--(void)openTokSesionConnectedWithSession:(OTSession *)session;
-
-@end
-
-
-@interface OpenTokInitializer : NSObject <OTSessionDelegate>
+@interface OpenTokInitializer : NSObject
 
 +(OpenTokInitializer *)sharedInstance;
 
-@property(nonatomic, assign) id<OpenTokInitializerDelegate> openTokDelegate;
-
--(void)intializeWithURL:(NSString *)urlString withRequest:(NSDictionary *)request withCompletionHandler:(void(^)(NSError *error))CompletionHandler;
+-(void)intializeWithURL:(NSString *)urlString withRequest:(NSDictionary *)request withCompletionHandler:(void(^)(NSDictionary *response, NSError *error))CompletionHandler;
 
 @end
 

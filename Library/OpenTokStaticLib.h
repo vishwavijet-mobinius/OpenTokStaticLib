@@ -9,3 +9,4 @@
 #import <Foundation/Foundation.h>
 
 #import "OpenTokInitializer.h"
+#import "OpenTokSession.h"
