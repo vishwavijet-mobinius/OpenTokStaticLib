@@ -36,9 +36,17 @@ typedef enum : int {
 
 @property(nonatomic, assign) id<OpenTokSessionDelegate> openTokDelegate;
 
+/*
+ API to initialize the session.
+ */
 -(id)initWithAPIkey:(NSString *)apiKey withSession:(NSString *)session withToken:(NSString *)token withDelegate:(id<OpenTokSessionDelegate>)delegate;
 
+
+/*
+ Call this api to connect to the session and start the streaming.
+ */
 -(void)connect;
+
 
 #pragma mark - API for two callers, Publisher & Subscriber
 /*
@@ -55,4 +63,21 @@ typedef enum : int {
  */
 -(void)loadDefaultSubscriberViewOnView:(UIView *)view;
 
+
+/*
+ Subcriber view loader for max 2 subsrcibers.
+ */
+-(void)loadSubscriber:(OTSubscriber *)sub withStream:(OTStream *)stream onView:(UIView *)view;
+
+
+/*
+ API to toggle camera from front & back.
+ */
+-(void)cameraToggle;
+
+
+/*
+ API to toggle audio to mute & unmute.
+ */
+-(void)audioToggle;
 @end

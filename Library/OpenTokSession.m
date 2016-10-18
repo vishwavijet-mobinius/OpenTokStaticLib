@@ -15,6 +15,13 @@
 @property (strong) OTSession *session;
 @property (strong) OTPublisher *publisher;
 @property (strong) OTSubscriber *subscriber;
+
+@property (strong) NSMutableDictionary *allStreams;
+@property (strong) NSMutableDictionary *allSubscribers;
+@property (strong) NSMutableArray *allConnectionsIds;
+
+@property (strong) UIView *preview;
+
 @end
 
 @implementation OpenTokSession
@@ -66,10 +73,31 @@
 }
 
 
+-(void)loadSubscriber:(OTSubscriber *)sub withStream:(OTStream *)stream onView:(UIView *)view{
+    self.preview = view;
+    if (self.allConnectionsIds.count == 1){
+        self.subscriber = sub ? sub : self.subscriber;
+        self.subscriber.view.frame = CGRectMake(view.bounds.origin.x, view.bounds.origin.y, view.bounds.size.width, view.bounds.size.height);
+        [view insertSubview:self.subscriber.view belowSubview:self.publisher.view];
+    }
+    else if (self.allConnectionsIds.count == 2){
+        [self.subscriber.view removeFromSuperview];
+        
+        OTSubscriber *sub1 = [self.allSubscribers valueForKey:[self.allConnectionsIds objectAtIndex:0]];
+        sub1.view.frame = CGRectMake(view.bounds.origin.x, view.bounds.origin.y, view.bounds.size.width, view.bounds.size.height/2);
+        [view insertSubview:sub1.view belowSubview:self.publisher.view];
+        
+        OTSubscriber *sub2 = [self.allSubscribers valueForKey:[self.allConnectionsIds objectAtIndex:1]];
+        sub2.view.frame = CGRectMake(view.bounds.origin.x, view.bounds.size.height/2, view.bounds.size.width, view.bounds.size.height/2);
+        [view insertSubview:sub2.view belowSubview:self.publisher.view];
+    }
+}
+
+
 -(void)startSubscribingWithStream:(OTStream *)stream{
-    self.subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
+    OTSubscriber *sub = [[OTSubscriber alloc] initWithStream:stream delegate:self];
     OTError *error;
-    [self.session subscribe:self.subscriber error:&error];
+    [self.session subscribe:sub error:&error];
     if (error) {
         NSLog(@"***Failed to subscribe Subscriber : %@",error.localizedDescription);
     }
@@ -98,14 +126,30 @@
 
 
 -(void)session:(OTSession *)session streamCreated:(OTStream *)stream{
-    if (self.subscriber == nil) {
-        [self startSubscribingWithStream:stream];
-    }
+    [self startSubscribingWithStream:stream];
 }
 
 
 -(void)session:(OTSession *)session streamDestroyed:(OTStream *)stream{
     
+}
+
+
+-(void)session:(OTSession*) session connectionCreated:(OTConnection*) connection{
+    
+}
+
+
+-(void)session:(OTSession *)session connectionDestroyed:(OTConnection *)connection{
+ 
+    if ([self.allConnectionsIds containsObject:connection.connectionId] && self.preview != nil) {
+        [self.allConnectionsIds removeObject:connection.connectionId];
+        [self.allSubscribers removeObjectForKey:connection.connectionId];
+        [self.allStreams removeObjectForKey:connection.connectionId];
+        
+        self.subscriber = [self.allSubscribers objectForKey:self.allConnectionsIds.firstObject];
+        [self loadSubscriber:nil withStream:nil onView:self.preview];
+    }
 }
 
 #pragma mark Publisher Delegate Methods
@@ -122,6 +166,13 @@
 
 -(void)subscriberDidConnectToStream:(OTSubscriberKit *)subscriber{
     NSLog(@"***Subscriber Connected***");
+    
+    // create subscriber
+    OTSubscriber *sub = (OTSubscriber *)subscriber;
+    [self.allSubscribers setObject:subscriber forKey:sub.stream.connection.connectionId];
+    [self.allConnectionsIds addObject:sub.stream.connection.connectionId];
+    [self.allStreams setObject:sub.stream forKey:sub.stream.connection.connectionId];
+    
     if ([self.openTokDelegate respondsToSelector:@selector(subscriber:connectedToStream:)]){
         [self.openTokDelegate performSelector:@selector(subscriber:connectedToStream:) withObject:nil];
     }
