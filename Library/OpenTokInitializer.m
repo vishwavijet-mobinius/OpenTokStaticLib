@@ -26,7 +26,7 @@ static OpenTokInitializer *sharedInstance = nil;
 -(void)intializeWithURL:(NSString *)urlString withRequest:(NSDictionary *)request withCompletionHandler:(void(^)(NSDictionary *response, NSError *error))CompletionHandler
 {
     NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:urlString] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:300];
-    urlRequest.HTTPMethod = @"POST";
+    urlRequest.HTTPMethod = @"PUT";
     NSError *error = nil;
     NSData *data = [NSJSONSerialization dataWithJSONObject:request options:NSJSONWritingPrettyPrinted error:&error];
     if (error)
