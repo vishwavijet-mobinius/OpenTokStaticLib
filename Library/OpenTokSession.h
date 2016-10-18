@@ -80,4 +80,10 @@ typedef enum : int {
  API to toggle audio to mute & unmute.
  */
 -(void)audioToggle;
+
+
+/*
+ API to disconnect self from the session.
+ */
+-(void)disconnect;
 @end

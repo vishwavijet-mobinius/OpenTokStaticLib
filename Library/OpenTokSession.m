@@ -42,6 +42,11 @@
     }
 }
 
+-(void)disconnect{
+    OTError *error;
+    [self.session unpublish:self.publisher error:&error];
+}
+
 -(void)startPublishingOnView:(UIView *)view atPosition:(OpenTokPublisherViewPosition)position{
     self.publisher = [[OTPublisher alloc] initWithDelegate:self];
     OTError *error;
@@ -156,6 +161,14 @@
 
 -(void)publisher:(OTPublisherKit *)publisher didFailWithError:(OTError *)error{
     NSLog(@"***Publisher Failed publishing with error : %@",error.localizedDescription);
+}
+
+- (void)publisher:(OTPublisherKit*)publisher streamDestroyed:(OTStream*)stream{
+    NSLog(@"***Publisher Stopped Streaming & disconnecting from session");
+    self.publisher = nil;
+    _allConnectionsIds = nil;
+    _allStreams= nil;
+    _allSubscribers = nil;
 }
 
 #pragma mark Subscriber Delegate methods
