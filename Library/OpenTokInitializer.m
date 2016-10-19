@@ -41,7 +41,7 @@ static OpenTokInitializer *sharedInstance = nil;
         if (error == nil) {
             NSError *jsonError = nil;
             NSDictionary *responseDict =[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&jsonError];
-            CompletionHandler(responseDict,nil);
+            jsonError? CompletionHandler(nil,jsonError) : CompletionHandler(responseDict,nil);
         }
         else{
             CompletionHandler(nil,error);
