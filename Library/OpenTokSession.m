@@ -30,6 +30,10 @@
     self.sessionId = session;
     self.token = token;
     self.session = [[OTSession alloc] initWithApiKey:apiKey sessionId:session delegate:self];
+    
+    self.allConnectionsIds = [NSMutableArray new];
+    self.allStreams = [NSMutableDictionary new];
+    self.allSubscribers = [NSMutableDictionary new];
     return  self;
 }
 
@@ -74,7 +78,7 @@
 
 -(void)loadDefaultSubscriberViewOnView:(UIView *)view{
     self.subscriber.view.frame = CGRectMake(view.bounds.origin.x, view.bounds.origin.y, view.bounds.size.width, view.bounds.size.height);
-    [view addSubview:self.subscriber.view];
+    [view insertSubview:self.subscriber.view belowSubview:self.publisher.view];
 }
 
 
@@ -186,8 +190,9 @@
     [self.allConnectionsIds addObject:sub.stream.connection.connectionId];
     [self.allStreams setObject:sub.stream forKey:sub.stream.connection.connectionId];
     
+    self.subscriber = self.allConnectionsIds.count == 1 ? sub : nil;
     if ([self.openTokDelegate respondsToSelector:@selector(subscriber:connectedToStream:)]){
-        [self.openTokDelegate performSelector:@selector(subscriber:connectedToStream:) withObject:nil];
+        [self.openTokDelegate performSelector:@selector(subscriber:connectedToStream:) withObject:subscriber.stream];
     }
 }
 
