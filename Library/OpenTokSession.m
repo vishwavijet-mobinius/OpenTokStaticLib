@@ -125,7 +125,7 @@
 -(void)session:(OTSession *)session didFailWithError:(OTError *)error{
     NSLog(@"***Session Connection failed with error : %@",error.localizedDescription);
     if ([self.openTokDelegate respondsToSelector:@selector(openTokSesionDidFailWithError:)]){
-        [self.openTokDelegate performSelector:@selector(openTokSesionDidFailWithError:) withObject:nil];
+        [self.openTokDelegate performSelector:@selector(openTokSesionDidFailWithError:) withObject:error];
     }
 }
 

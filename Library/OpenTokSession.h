@@ -21,7 +21,7 @@ typedef enum : int {
 //Session delegate methods
 -(void)openTokSesionConnectedWithSession:(OTSession *)session;
 
--(void)openTokSesionDidFailWithError:(OTError *)session;
+-(void)openTokSesionDidFailWithError:(OTError *)error;
 
 //publisher delegate methods
 
