@@ -16,6 +16,7 @@ typedef enum : int {
     OpenTokBottomLeftCorner
 } OpenTokPublisherViewPosition;
 
+#pragma mark Session Protocol
 @protocol OpenTokSessionDelegate <NSObject>
 
 //Session delegate methods
@@ -29,12 +30,34 @@ typedef enum : int {
 //Subscriber delegate methods
 -(void)subscriber:(OTSubscriberKit *)sub connectedToStream:(OTStream *)stream;
 
+//Message delegate call
+-(void)receivedMessageWithObject:(NSDictionary *)objectDict;
+
 @end
 
 
+#pragma mark Messaging Protocol
+@protocol OpenTokSessionMessageDelegate <NSObject>
+
+//Message delegate call
+-(void)receivedMessageWithObject:(NSDictionary *)objectDict;
+
+@end
+
+#pragma mark Class OpenTokSession
 @interface OpenTokSession : NSObject<OTSessionDelegate,OTPublisherKitDelegate,OTSubscriberKitDelegate>
 
 @property(nonatomic, assign) id<OpenTokSessionDelegate> openTokDelegate;
+
+@property(nonatomic, assign) id<OpenTokSessionMessageDelegate> openTokMessageDelegate;
+
+@property (nonatomic,strong) OTSession *session;
+
+@property (strong) NSMutableDictionary *allSubscribers;
+
+@property (strong) NSMutableArray *allConnectionsIds;
+
+@property (strong) NSMutableArray *allConnections;
 
 /*
  API to initialize the session.
@@ -48,7 +71,7 @@ typedef enum : int {
 -(void)connect;
 
 
-#pragma mark - API for two callers, Publisher & Subscriber
+//API for two callers, Publisher & Subscriber
 /*
  Load publisher view on top of subscriber view on any of the corners then use this API.
  If you use this API, then subcriber view will be the default larger view and u need to call
@@ -86,4 +109,11 @@ typedef enum : int {
  API to disconnect self from the session.
  */
 -(void)disconnect;
+
+/*
+ API to send message to the connections in session.
+ If connection is set to nil, everyone in the session will receive the message
+ If connection is set, then only that particular connection will receive the message
+ */
+-(void)sendMessage:(NSString *)string connection:(OTConnection*)connection withType:(NSString *)type withDelegate:(id<OpenTokSessionMessageDelegate>)delegate;
 @end

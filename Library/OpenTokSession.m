@@ -12,19 +12,18 @@
 @property(strong)NSString *token;
 @property(strong)NSString *sessionId;
 
-@property (strong) OTSession *session;
 @property (strong) OTPublisher *publisher;
 @property (strong) OTSubscriber *subscriber;
 
 @property (strong) NSMutableDictionary *allStreams;
-@property (strong) NSMutableDictionary *allSubscribers;
-@property (strong) NSMutableArray *allConnectionsIds;
+
 
 @property (strong) UIView *preview;
 
 @end
 
 @implementation OpenTokSession
+@synthesize allConnectionsIds,allSubscribers,allConnections;
 
 -(id)initWithAPIkey:(NSString *)apiKey withSession:(NSString *)session withToken:(NSString *)token withDelegate:(id<OpenTokSessionDelegate>)delegate{
     self.sessionId = session;
@@ -32,6 +31,7 @@
     self.session = [[OTSession alloc] initWithApiKey:apiKey sessionId:session delegate:self];
     
     self.allConnectionsIds = [NSMutableArray new];
+    self.allConnections = [NSMutableArray new];
     self.allStreams = [NSMutableDictionary new];
     self.allSubscribers = [NSMutableDictionary new];
     return  self;
@@ -59,16 +59,16 @@
     CGRect publisherRect;
     switch (position) {
         case OpenTokTopLeftCorner:
-            publisherRect = CGRectMake(view.bounds.origin.x, view.bounds.origin.y, view.bounds.size.width/2, view.bounds.size.height/4);
+            publisherRect = CGRectMake(view.bounds.origin.x+20, view.bounds.origin.y+20, view.bounds.size.width/3, view.bounds.size.height/4);
             break;
         case OpenTokTopRightCorner:
-            publisherRect = CGRectMake(view.bounds.size.width/2, view.bounds.origin.y, view.bounds.size.width/2, view.bounds.size.height/4);
+            publisherRect = CGRectMake(view.bounds.size.width/2+20, view.bounds.origin.y+20, view.bounds.size.width/3, view.bounds.size.height/4);
             break;
         case OpenTokBottomLeftCorner:
-            publisherRect = CGRectMake(view.bounds.origin.x, (view.bounds.size.height/4)*3, view.bounds.size.width/2, view.bounds.size.height/4);
+            publisherRect = CGRectMake(view.bounds.origin.x+20, (view.bounds.size.height/4)*3, view.bounds.size.width/3, view.bounds.size.height/4);
             break;
         case OpenTokBottomRightCorner:
-            publisherRect = CGRectMake(view.bounds.size.width/2, (view.bounds.size.height/4)*3, view.bounds.size.width/2, view.bounds.size.height/4);
+            publisherRect = CGRectMake(view.bounds.size.width/2+20, (view.bounds.size.height/4)*3, view.bounds.size.width/3, view.bounds.size.height/4);
             break;
     }
     self.publisher.view.frame = publisherRect;
@@ -112,6 +112,14 @@
     }
 }
 
+-(void)sendMessage:(NSString *)string connection:(OTConnection*)connection withType:(NSString *)type withDelegate:(id<OpenTokSessionMessageDelegate>)delegate{
+    OTError *error;
+    [self.session signalWithType:type string:string connection:connection error:&error];
+    if (error) {
+        NSLog(@"Message sending failed with error : %@",error.localizedDescription);
+    }
+}
+
 #pragma mark OTSession Delegate Methods
 -(void)sessionDidConnect:(OTSession *)session{
     NSLog(@"***Session Connected for ID : %@",session.sessionId);
@@ -140,7 +148,18 @@
 
 
 -(void)session:(OTSession *)session streamDestroyed:(OTStream *)stream{
-    
+    OTConnection *connection = stream.connection;
+    if ([self.allConnectionsIds containsObject:connection.connectionId] && self.preview != nil) {
+        
+        OTSubscriber *sub = [self.allSubscribers objectForKey:connection.connectionId];
+        [sub.view removeFromSuperview];
+        [self.allConnectionsIds removeObject:connection.connectionId];
+        [self.allConnections removeObject:connection];
+        [self.allSubscribers removeObjectForKey:connection.connectionId];
+        [self.allStreams removeObjectForKey:connection.connectionId];
+        self.subscriber = [self.allSubscribers objectForKey:self.allConnectionsIds.firstObject];
+        [self loadSubscriber:nil withStream:nil onView:self.preview];
+    }
 }
 
 
@@ -153,6 +172,7 @@
  
     if ([self.allConnectionsIds containsObject:connection.connectionId] && self.preview != nil) {
         [self.allConnectionsIds removeObject:connection.connectionId];
+        [self.allConnections removeObject:connection];
         [self.allSubscribers removeObjectForKey:connection.connectionId];
         [self.allStreams removeObjectForKey:connection.connectionId];
         
@@ -170,9 +190,10 @@
 - (void)publisher:(OTPublisherKit*)publisher streamDestroyed:(OTStream*)stream{
     NSLog(@"***Publisher Stopped Streaming & disconnecting from session");
     self.publisher = nil;
-    _allConnectionsIds = nil;
+    allConnectionsIds = nil;
+    allConnections = nil;
     _allStreams= nil;
-    _allSubscribers = nil;
+    allSubscribers = nil;
 }
 
 #pragma mark Subscriber Delegate methods
@@ -188,6 +209,7 @@
     OTSubscriber *sub = (OTSubscriber *)subscriber;
     [self.allSubscribers setObject:subscriber forKey:sub.stream.connection.connectionId];
     [self.allConnectionsIds addObject:sub.stream.connection.connectionId];
+    [self.allConnections addObject:sub.stream.connection];
     [self.allStreams setObject:sub.stream forKey:sub.stream.connection.connectionId];
     
     self.subscriber = self.allConnectionsIds.count == 1 ? sub : nil;
@@ -206,4 +228,25 @@
     self.publisher.publishAudio = self.publisher.publishAudio == true ? false : true;
 }
 
+
+#pragma mark Message delegate methods
+
+- (void)   session:(OTSession*)session
+receivedSignalType:(NSString*)type
+    fromConnection:(OTConnection*)connection
+        withString:(NSString*)string
+{
+    NSDictionary *object = @{@"session":session,@"type":type,@"connection":connection,@"message":string};
+    if (self.openTokMessageDelegate != nil){
+        if ([self.openTokMessageDelegate respondsToSelector:@selector(receivedMessageWithObject:)]){
+            [self.openTokMessageDelegate performSelector:@selector(receivedMessageWithObject:) withObject:object];
+        }
+    }
+    else{
+        if ([self.openTokDelegate respondsToSelector:@selector(receivedMessageWithObject:)]){
+            [self.openTokDelegate performSelector:@selector(receivedMessageWithObject:) withObject:object];
+        }
+    }
+    
+}
 @end
