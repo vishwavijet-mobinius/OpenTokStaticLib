@@ -53,11 +53,11 @@ typedef enum : int {
 
 @property (nonatomic,strong) OTSession *session;
 
-@property (strong) NSMutableDictionary *allSubscribers;
-
 @property (strong) NSMutableArray *allConnectionsIds;
 
 @property (strong) NSMutableArray *allConnections;
+
+@property (strong) NSMutableDictionary *messagesDict;
 
 /*
  API to initialize the session.

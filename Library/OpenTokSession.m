@@ -14,7 +14,7 @@
 
 @property (strong) OTPublisher *publisher;
 @property (strong) OTSubscriber *subscriber;
-
+@property (strong) NSMutableDictionary *allSubscribers;
 @property (strong) NSMutableDictionary *allStreams;
 
 
@@ -23,7 +23,7 @@
 @end
 
 @implementation OpenTokSession
-@synthesize allConnectionsIds,allSubscribers,allConnections;
+@synthesize allConnectionsIds,allSubscribers,allConnections,messagesDict;
 
 -(id)initWithAPIkey:(NSString *)apiKey withSession:(NSString *)session withToken:(NSString *)token withDelegate:(id<OpenTokSessionDelegate>)delegate{
     self.sessionId = session;
@@ -34,6 +34,9 @@
     self.allConnections = [NSMutableArray new];
     self.allStreams = [NSMutableDictionary new];
     self.allSubscribers = [NSMutableDictionary new];
+    
+    self.messagesDict = [NSMutableDictionary new];
+    self.messagesDict[@"group"] = [NSMutableArray new];
     return  self;
 }
 
@@ -118,6 +121,16 @@
     if (error) {
         NSLog(@"Message sending failed with error : %@",error.localizedDescription);
     }
+    if (connection != nil){
+        [self.messagesDict[connection.connectionId] addObject:@{@"msg":string,@"time":self.todayDate,@"fromSelf":@YES}];
+    }
+}
+
+-(NSString *)todayDate
+{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"dd/MM/yy h:mm a";
+    return [dateFormatter stringFromDate:NSDate.date];
 }
 
 #pragma mark OTSession Delegate Methods
@@ -211,7 +224,7 @@
     [self.allConnectionsIds addObject:sub.stream.connection.connectionId];
     [self.allConnections addObject:sub.stream.connection];
     [self.allStreams setObject:sub.stream forKey:sub.stream.connection.connectionId];
-    
+    self.messagesDict[sub.stream.connection.connectionId] = [NSMutableArray new];
     self.subscriber = self.allConnectionsIds.count == 1 ? sub : nil;
     if ([self.openTokDelegate respondsToSelector:@selector(subscriber:connectedToStream:)]){
         [self.openTokDelegate performSelector:@selector(subscriber:connectedToStream:) withObject:subscriber.stream];
@@ -236,7 +249,22 @@ receivedSignalType:(NSString*)type
     fromConnection:(OTConnection*)connection
         withString:(NSString*)string
 {
-    NSDictionary *object = @{@"session":session,@"type":type,@"connection":connection,@"message":string};
+    NSDictionary *object;
+    
+    if ([type isEqualToString:@"group"]){
+        if ([self.session.connection.connectionId isEqualToString:connection.connectionId]){
+            object = @{@"session":session,@"type":type,@"connection":connection,@"message":@{@"msg":string,@"time":self.todayDate,@"fromSelf":@YES}};
+        }
+        else{
+            object = @{@"session":session,@"type":type,@"connection":connection,@"message":@{@"msg":string,@"time":self.todayDate,@"fromSelf":@NO}};
+        }
+        [self.messagesDict[@"group"] addObject:object[@"message"]];
+    }
+    else{
+        object = @{@"session":session,@"type":type,@"connection":connection,@"message":@{@"msg":string,@"time":self.todayDate,@"fromSelf":@NO}};
+        [self.messagesDict[connection.connectionId] addObject:object[@"message"]];
+    }
+    
     if (self.openTokMessageDelegate != nil){
         if ([self.openTokMessageDelegate respondsToSelector:@selector(receivedMessageWithObject:)]){
             [self.openTokMessageDelegate performSelector:@selector(receivedMessageWithObject:) withObject:object];
